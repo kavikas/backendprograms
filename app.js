@@ -4,7 +4,7 @@ var express = require("express");
 const app = express();
 //middleware
 app.use(express.json());
-mongoose.connect("mongodb://localhost:27017/expense").then(() => {
+mongoose.connect("mongodb+srv://kavikas2023cce:kavikas73@cluster0.4yzexas.mongodb.net/expense").then(() => {
     console.log("connected to databse");
 });
 const expenseSchema = new mongoose.Schema({
@@ -29,7 +29,7 @@ app.get("/api/expenses/:id", async (req, res) => {
         if (!expenses) {
             return res.status(404).json({ message: "expense not found" });
         }
-        
+
         res.status(200).json(expenses);
     }
     catch (error) {
