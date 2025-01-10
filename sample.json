@@ -1,0 +1,26 @@
+[{
+    "name":"kaavika",
+    "age":"18",
+    "city":"erode",
+    "amount":"1000"
+},
+{
+    "name":"yalini",
+    "age":"19",
+    "city":"madurai",
+    "amount":"1500"
+
+},
+{
+    "name":"pradeepa",
+    "age":"20",
+    "city":"thirunelveli",
+    "amount":"1800"
+},
+{
+    "name":"shivani",
+    "age":"20",
+    "city":"kanyakumari",
+    "amount":"2000"
+
+}]
