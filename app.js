@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const { v4: uuidv4 } = require("uuid");
 var express = require("express");
 const app = express();
+const cros=require('cors');//cors for resolving the error
 //middleware
 app.use(express.json());
 mongoose.connect("mongodb+srv://kavikas2023cce:kavikas73@cluster0.4yzexas.mongodb.net/expense").then(() => {
