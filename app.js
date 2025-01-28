@@ -2,23 +2,84 @@ const mongoose = require("mongoose");
 const { v4: uuidv4 } = require("uuid");
 var express = require("express");
 const app = express();
-const cros=require('cors');//cors for resolving the error
+const cors=require('cors');//cors for resolving the error
 //middleware
+const authMiddleware=require("./middlewares/auth");
+const bcrypt=require("bcrypt");
+const jwt=require("jsonwebtoken");
 app.use(express.json());
+app.use(cors());
 mongoose.connect("mongodb+srv://kavikas2023cce:kavikas73@cluster0.4yzexas.mongodb.net/expense").then(() => {
     console.log("connected to databse");
 });
+const userSchema=new mongoose.Schema({
+    id:String,
+    name:String,
+    email:String,
+    password:String,
+})
+const User=mongoose.model("User",userSchema);
+app.post("/signup",async(req,res)=>{
+
+    const { name,email,password}=req.body;
+    try{
+        const user=await User.findOne({email});
+        if(user){
+            return res.status(400).json({message:"Email already exist"});
+        }
+        const hashedPassword =await bcrypt.hash(password,10);
+        const newUser=new User({
+            id:uuidv4(),
+            email,
+            name,
+            password:hashedPassword,
+        })
+        await newUser.save();
+        res.json({message:"User Created succesfully"});
+
+    }catch(error){
+        
+        res.status(500).json({message:"Internal server error"});
+    }
+
+});
+app.post("/login",async(req,res)=>{
+    const {email,password}=req.body;
+
+    try{
+        const user=await User.findOne({email});
+        if(!user){
+            return res.status(400).json({message:" invalid email"});
+        }
+        const isValidPassword = await bcrypt.compare(password,user.password);
+        if(!isValidPassword){
+        return res.status(400).json({message:"Invalid password"});
+        }
+        const token=jwt.sign({id:user.id},"secret_key",{expiresIn:"1h"});
+        res.status(200).json(token)
+
+    }
+    catch(error){
+        
+        return res.status(500).json({message:"Internal server error"});
+    }
+})
+
+
+
 const expenseSchema = new mongoose.Schema({
-    id: { type: String, require: true, unique: true },//unique is used for each id should be unique. if i creade same id mongodb will show an error
+    id: { type: String, require: true, unique: true },//this is used for each id should be unique. if i creade same id mongodb will show an error
     titile: { type: String, require: true }, //required true is usedn for  that feel be must
     amount: { type: Number, require: true }
 });
 const Expenses = mongoose.model("Expenses", expenseSchema);
-app.get("/api/expenses", async (req, res) => {
+app.get("/api/expenses",async (req, res) => {
+    console.log(req.user)
     try {
         const expenses = await Expenses.find();
         res.status(200).json(expenses);
     } catch (error) {
+        onsole.log(error);
         res.status(500).json({ message: "failed in fetch expenses" });
     }
 
